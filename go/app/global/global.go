@@ -20,3 +20,8 @@ var (
 var (
 	UserUsecase domain.UserUseCase
 )
+
+const(
+	JwtSecret = "secret-123"
+)
+	

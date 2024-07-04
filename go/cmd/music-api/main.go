@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -22,6 +23,8 @@ func main(){
 	global.DbConn=db
 
 	global.Echo = echo.New()
+	global.Echo.Use(middleware.CORS())
+
 
 	global.Validate = validator.New(validator.WithRequiredStructEnabled())
 	registerRepo()

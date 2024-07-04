@@ -3,6 +3,7 @@ package http_delivery_users
 import (
 	"main/app/domain"
 	"main/app/global"
+	"main/app/modules/http/http_usecase"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -60,9 +61,23 @@ func (h UserHandler) CreateUser(c echo.Context) error {
 		})
 	}
 }
+
+func (h UserHandler) ListUsers(c echo.Context) error {
+	users, err := global.UserUsecase.Get(c)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, "domain.ErrBadParamInput.Error()")
+	} else {
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			// "rc":    domain.RC_00_OK,
+			"users": users,
+		})
+	}
+}
+
+
 func HttpUserHandler() {
 	handler := &UserHandler{}
 	global.Echo.POST("/users/register", handler.CreateUser)
 	global.Echo.POST("/users/login", handler.Login)
-
+	global.Echo.GET("/users", handler.ListUsers, http_usecase.IsLoggedIn)
 }
