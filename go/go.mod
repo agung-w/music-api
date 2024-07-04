@@ -4,6 +4,7 @@ go 1.22.4
 
 require (
 	github.com/go-playground/validator/v10 v10.22.0
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/labstack/echo v3.3.10+incompatible
 	golang.org/x/crypto v0.22.0
 	gorm.io/driver/sqlite v1.5.6

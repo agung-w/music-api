@@ -23,6 +23,6 @@ type UserRepository interface{
 }
 
 type UserUseCase interface {
-	Login(ctx echo.Context, email, password string) (accessToken string, refreshToken string, err error)
+	Login(ctx echo.Context, email, password string) (accessToken string, err error)
 	RegisterUser(ctx echo.Context, user Users) (err error)
 }

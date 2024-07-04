@@ -12,6 +12,27 @@ type UserHandler struct {
 	UserUsecase domain.UserUseCase
 }
 
+func (h UserHandler) Login(c echo.Context) error {
+	data := new(domain.Users)
+	if err := c.Bind(data); err != nil {
+		return err
+	}
+
+	accessToken, err := global.UserUsecase.Login(c, data.Email, data.Password)
+
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{
+			// "rc":  domain.RC_02_INVALID_AUTHORIZATION,
+			"msg": err.Error(),
+		})
+	} else {
+		return c.JSON(http.StatusOK, map[string]string{
+			// "rc":            domain.RC_00_OK,
+			"access_token":  accessToken,
+		})
+	}
+}
+
 
 func (h UserHandler) CreateUser(c echo.Context) error {
 	data := new(domain.Users)
@@ -42,5 +63,6 @@ func (h UserHandler) CreateUser(c echo.Context) error {
 func HttpUserHandler() {
 	handler := &UserHandler{}
 	global.Echo.POST("/users/register", handler.CreateUser)
+	global.Echo.POST("/users/login", handler.Login)
 
 }
