@@ -3,3 +3,4 @@
 /go/vendor/
 /.vscode/
 *.db
+/go/musics
