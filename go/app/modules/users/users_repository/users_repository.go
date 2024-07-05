@@ -10,20 +10,20 @@ type gormUserRepo struct {
 }
 
 func (g gormUserRepo) Get(ctx echo.Context) (users []domain.Users, err error) {
-	err = global.DbConn.Omit("id", "password", "2fa_on", "otp_secret", "otp_auth_url", "recovery_code").Find(&users).Error
+	err = global.DbConn.Omit("id", "password").Find(&users).Error
 	return
 }
 
 func (g gormUserRepo) GetById(ctx echo.Context, id int64) (user domain.Users, err error) {
 	err = global.DbConn.Where("id=?", id).
-		Omit("password", "2fa_on", "otp_secret", "otp_auth_url", "recovery_code").
+		Omit("password").
 		First(&user).Error
 	return
 }
 
 func (g gormUserRepo) GetByEmail(ctx echo.Context, email string) (user domain.Users, err error) {
 	err = global.DbConn.Where("email=?", email).First(&user).Error
-	return
+	return 
 }
 
 func (g gormUserRepo) Post(ctx echo.Context, user *domain.Users) (err error) {

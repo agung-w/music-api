@@ -74,10 +74,31 @@ func (h UserHandler) ListUsers(c echo.Context) error {
 	}
 }
 
+func (h UserHandler) SetAsAdministrator(c echo.Context) error {
+	data := new(domain.Users)
+	if err := c.Bind(data); err != nil {
+		return err
+	}
+
+	err := global.UserUsecase.SetAsAdministrator(c, data.Email)
+
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{
+			// "rc":  domain.RC_02_INVALID_AUTHORIZATION,
+			"msg": err.Error(),
+		})
+	} else {
+		return c.JSON(http.StatusOK, map[string]string{
+			// "rc":            domain.RC_00_OK,
+		})
+	}
+}
+
 
 func HttpUserHandler() {
 	handler := &UserHandler{}
 	global.Echo.POST("/users/register", handler.CreateUser)
 	global.Echo.POST("/users/login", handler.Login)
-	global.Echo.GET("/users", handler.ListUsers, http_usecase.IsLoggedIn)
+	global.Echo.GET("/users", handler.ListUsers, http_usecase.IsLoggedIn, http_usecase.IsAdministrator)
+	global.Echo.POST("/users/manage/set_as_admin", handler.SetAsAdministrator, http_usecase.IsLoggedIn, http_usecase.IsAdministrator)
 }

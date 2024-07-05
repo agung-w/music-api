@@ -3,6 +3,8 @@ package main
 import (
 	"main/app/domain"
 	"main/app/global"
+	"main/app/modules/roles/roles_repository"
+	"main/app/modules/roles/roles_usecase"
 	"main/app/modules/users/http_delivery_users"
 	"main/app/modules/users/users_repository"
 	"main/app/modules/users/users_usecase"
@@ -19,7 +21,7 @@ func main(){
   if err != nil {
     panic("failed to connect database")
   }
-	db.AutoMigrate(&domain.Users{})
+	db.AutoMigrate(&domain.Users{}, &domain.Roles{})
 	global.DbConn=db
 
 	global.Echo = echo.New()
@@ -60,10 +62,12 @@ func main(){
 // }
 
 func registerRepo() {
+	global.RoleRepo = roles_repository.New()
 	global.UserRepo = users_repository.New()
 }
 
 func registerUsecase() {
+	global.RoleUsecase = roles_usecase.New()
 	global.UserUsecase = users_usecase.New()
 }
 

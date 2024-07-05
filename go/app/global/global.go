@@ -14,10 +14,12 @@ var (
 )
 
 var (
+	RoleRepo domain.RoleRepository
 	UserRepo domain.UserRepository
 )
 
 var (
+	RoleUsecase domain.RoleUsecase
 	UserUsecase domain.UserUseCase
 )
 
