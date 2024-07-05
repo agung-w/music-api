@@ -1,8 +1,10 @@
 package users_usecase
 
 import (
+	"errors"
 	"main/app/domain"
 	"main/app/global"
+	"math/rand"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -13,7 +15,47 @@ import (
 type userUsecase struct {
 }
 
-// SetAsAdministrator implements domain.UserUseCase.
+func (u *userUsecase) RequestResetPassword(ctx echo.Context, email string) (resetPasswordToken string, err error) {
+	user, err := global.UserRepo.GetByEmail(ctx, email)
+	if err != nil {
+		return
+	}
+
+	const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	token := make([]byte, 6)
+	for i := range token {
+		token[i] = letterBytes[rand.Intn(len(letterBytes))]
+	}
+
+	user.ResetPasswordToken = string(token)
+
+	err = global.UserRepo.Patch(ctx, &user)
+	if err!= nil{
+		return
+	}
+	return string(token), nil
+}
+
+func (u *userUsecase) SetNewPassword(ctx echo.Context, email string, resetPasswordToken string, newPassword string) (err error) {
+	user, err := global.UserRepo.GetByEmail(ctx, email)
+	if err != nil {
+		return
+	}
+
+	if(resetPasswordToken != user.ResetPasswordToken){
+		return errors.New("invalid token given")
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	user.Password = string(hashedPassword)
+	user.ResetPasswordToken = " "
+	return global.UserRepo.Patch(ctx, &user)
+}
+
 func (u *userUsecase) SetAsAdministrator(ctx echo.Context, email string) (err error) {
 	user, err := global.UserRepo.GetByEmail(ctx, email)
 	if err != nil {
@@ -25,13 +67,8 @@ func (u *userUsecase) SetAsAdministrator(ctx echo.Context, email string) (err er
 		return
 	}
 
-	user.RolesId=role.Id
-	return global.UserRepo.Patch(ctx,&user)
-}
-
-// ResetPassword implements domain.UserUseCase.
-func (u *userUsecase) ResetPassword(ctx echo.Context, email string) (err error) {
-	panic("unimplemented")
+	user.RolesId = role.Id
+	return global.UserRepo.Patch(ctx, &user)
 }
 
 func (*userUsecase) Login(ctx echo.Context, email, password string) (accessToken string, err error) {

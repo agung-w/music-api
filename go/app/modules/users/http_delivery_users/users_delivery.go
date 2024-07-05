@@ -94,6 +94,40 @@ func (h UserHandler) SetAsAdministrator(c echo.Context) error {
 	}
 }
 
+func (h UserHandler) RequestResetPassword(c echo.Context) error{
+	data := new(domain.Users)
+	if err := c.Bind(data); err != nil {
+		return err
+	}
+
+	token, err := global.UserUsecase.RequestResetPassword(c, data.Email)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest , map[string]string{
+			"msg": err.Error(),
+		})
+	} else {
+		return c.JSON(http.StatusOK, map[string]string{
+			"reset_password_token": token,
+		})
+	}
+}
+
+func (h UserHandler) SetNewPassword(c echo.Context) error{
+	data := new(domain.SetNewPassword)
+	if err := c.Bind(data); err != nil {
+		return err
+	}
+
+	err := global.UserUsecase.SetNewPassword(c, data.Email, data.ResetPasswordToken, data.Password)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest , map[string]string{
+			"msg": err.Error(),
+		})
+	} else {
+		return c.JSON(http.StatusOK, map[string]string{
+		})
+	}
+}
 
 func HttpUserHandler() {
 	handler := &UserHandler{}
@@ -101,4 +135,6 @@ func HttpUserHandler() {
 	global.Echo.POST("/users/login", handler.Login)
 	global.Echo.GET("/users", handler.ListUsers, http_usecase.IsLoggedIn, http_usecase.IsAdministrator)
 	global.Echo.POST("/users/manage/set_as_admin", handler.SetAsAdministrator, http_usecase.IsLoggedIn, http_usecase.IsAdministrator)
+	global.Echo.POST("/users/req_reset_password", handler.RequestResetPassword)
+	global.Echo.POST("/users/set_new_password", handler.SetNewPassword)
 }
