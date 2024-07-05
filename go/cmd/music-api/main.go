@@ -3,6 +3,9 @@ package main
 import (
 	"main/app/domain"
 	"main/app/global"
+	"main/app/modules/musics/http_delivery_musics"
+	"main/app/modules/musics/musics_repository"
+	"main/app/modules/musics/musics_usecase"
 	"main/app/modules/roles/roles_repository"
 	"main/app/modules/roles/roles_usecase"
 	"main/app/modules/users/http_delivery_users"
@@ -21,7 +24,7 @@ func main(){
   if err != nil {
     panic("failed to connect database")
   }
-	db.AutoMigrate(&domain.Users{}, &domain.Roles{})
+	db.AutoMigrate(&domain.Users{}, &domain.Roles{}, &domain.Musics{})
 	global.DbConn=db
 
 	global.Echo = echo.New()
@@ -62,15 +65,19 @@ func main(){
 // }
 
 func registerRepo() {
+	global.MusicRepo = musics_repository.New()
 	global.RoleRepo = roles_repository.New()
 	global.UserRepo = users_repository.New()
 }
 
 func registerUsecase() {
+	global.MusicUseCase = musics_usecase.New()
 	global.RoleUsecase = roles_usecase.New()
 	global.UserUsecase = users_usecase.New()
 }
 
 func registerHTTPHandler() {
+	http_delivery_musics.HttpUserHandler()
+	// http_delivery_roles.HttpRoleHandler()
 	http_delivery_users.HttpUserHandler()
 }

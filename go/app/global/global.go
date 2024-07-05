@@ -14,13 +14,15 @@ var (
 )
 
 var (
-	RoleRepo domain.RoleRepository
-	UserRepo domain.UserRepository
+	MusicRepo domain.MusicRepository
+	RoleRepo  domain.RoleRepository
+	UserRepo  domain.UserRepository
 )
 
 var (
-	RoleUsecase domain.RoleUsecase
-	UserUsecase domain.UserUseCase
+	MusicUseCase domain.MusicUseCase
+	RoleUsecase  domain.RoleUsecase
+	UserUsecase  domain.UserUseCase
 )
 
 const(
